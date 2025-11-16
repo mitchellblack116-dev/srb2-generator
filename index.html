@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRB2 PK3 Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ff6b35, #f7931e, #c44569);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        input[type="text"], select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .ability-box {
+            background: #f0f8ff;
+            border: 3px solid #4a90e2;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .ability-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="checkbox"] {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+        
+        .ability-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .ability-desc {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .download-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        }
+        
+        .download-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .download-btn:disabled {
+            opacity: 0.5;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            color: #856404;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            display: none;
+        }
+        
+        .status.show {
+            display: block;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 SRB2 PK3 Generator</h1>
+        <p class="subtitle">Create Dragon Ball Z Mods</p>
+        
+        <label for="modName">Mod Name:</label>
+        <input type="text" id="modName" value="DBZ_Abilities" placeholder="Enter mod name">
+        
+        <div class="ability-box">
+            <div class="ability-header">
+                <input type="checkbox" id="kamehameha" checked>
+                <span class="ability-title">💥 Kamehameha</span>
+            </div>
+            <p class="ability-desc">Just HOLD the button to charge cyan energy, release to fire beam!</p>
+            <div id="kamehamehaKey">
+                <label>Button:</label>
+                <select id="kameKey">
+                    <option value="Jump">Jump (Double-tap & Hold)</option>
+                    <option value="Spin">Spin (Double-tap & Hold)</option>
+                    <option value="Custom1">Custom 1</option>
+                    <option value="Custom2">Custom 2</option>
+                    <option value="Custom3">Custom 3</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="ability-box">
+            <div class="ability-header">
+                <input type="checkbox" id="spiritbomb" checked>
+                <span class="ability-title">🌟 Spirit Bomb</span>
+            </div>
+            <p class="ability-desc">Just HOLD the button to gather gold energy, release massive sphere!</p>
+            <div id="spiritbombKey">
+                <label>Button:</label>
+                <select id="spiritKey">
+                    <option value="Jump">Jump (Double-tap & Hold)</option>
+                    <option value="Spin">Spin (Double-tap & Hold)</option>
+                    <option value="Custom1">Custom 1</option>
+                    <option value="Custom2">Custom 2</option>
+                    <option value="Custom3">Custom 3</option>
+                </select>
+            </div>
+        </div>
+        
+        <button class="download-btn" onclick="downloadFiles()">⬇️ DOWNLOAD FILES</button>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="instructions">
+            <h3>📱 Instructions:</h3>
+            <ol>
+                <li>Tap "DOWNLOAD FILES" - you'll get 2 files (.lua and .soc)</li>
+                <li>Find them in your Downloads folder</li>
+                <li>Use a ZIP app (like ZArchiver) to create a ZIP with both files</li>
+                <li>Rename the .zip file to .pk3</li>
+                <li>Copy to SRB2 folder and load in game!</li>
+            </ol>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px; border: 2px solid #2196F3;">
+            <h3 style="color: #1976d2; margin-bottom: 10px;">💡 How to Save This Page:</h3>
+            <ol style="margin-left: 20px; color: #1976d2;">
+                <li>Tap the 3 dots (⋮) in your browser</li>
+                <li>Select "Download" or "Save page"</li>
+                <li>Save as "srb2generator.html"</li>
+                <li>Open the saved file anytime!</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function generateLua(modName, includeKame, includeSpirit, kameKey, spiritKey) {
+            let s = `-- ${modName} for SRB2\n-- Dragon Ball Z Abilities Mod\n\nlocal kamehameha_charging = {}\nlocal spirit_bomb_charging = {}\nlocal kame_lastbutton = {}\nlocal spirit_lastbutton = {}\n\n`;
+            
+            if (includeKame) {
+                s += `-- Kamehameha Attack\nlocal function FireKamehameha(player)\n    local mo = player.mo\n    if not mo or not mo.valid then return end\n    \n    local proj = P_SpawnMobj(\n        mo.x + P_ReturnThrustX(mo, mo.angle, 64*FRACUNIT),\n        mo.y + P_ReturnThrustY(mo, mo.angle, 64*FRACUNIT),\n        mo.z + 32*FRACUNIT,\n        MT_REDRING\n    )\n    \n    if proj and proj.valid then\n        proj.angle = mo.angle\n        proj.target = mo\n        proj.color = SKINCOLOR_CYAN\n        P_InstaThrust(proj, mo.angle, 80*FRACUNIT)\n        proj.momz = 0\n        \n        for i = 1, 3 do\n            local spark = P_SpawnMobj(proj.x, proj.y, proj.z + (i*8*FRACUNIT), MT_SONIC3KBOSSEXPLODE)\n            if spark and spark.valid then\n                spark.color = SKINCOLOR_CYAN\n            end\n        end\n        \n        S_StartSound(mo, sfx_wepfir)\n        CONS_Printf(player, "KAMEHAMEHA!")\n    end\nend\n\naddHook("PlayerThink", function(player)\n    if not (player and player.mo and player.mo.valid) then return end\n    \n    local pressing = (player.cmd.buttons & BT_${kameKey.toUpperCase()})\n    local waspressing = kame_lastbutton[#player]\n    \n    -- Just started holding\n    if pressing and not waspressing then\n        kamehameha_charging[#player] = 1\n        CONS_Printf(player, "Charging Kamehameha...")\n    end\n    \n    -- Charging\n    if kamehameha_charging[#player] and pressing then\n        kamehameha_charging[#player] = $ + 1\n        \n        -- Visual charging effect\n        if kamehameha_charging[#player] % 5 == 0 then\n            local mo = player.mo\n            local spark = P_SpawnMobj(\n                mo.x + P_RandomRange(-40, 40)*FRACUNIT,\n                mo.y + P_RandomRange(-40, 40)*FRACUNIT,\n                mo.z + P_RandomRange(0, 56)*FRACUNIT,\n                MT_SONIC3KBOSSEXPLODE\n            )\n            if spark and spark.valid then\n                spark.color = SKINCOLOR_CYAN\n            end\n        end\n    end\n    \n    -- Released button\n    if not pressing and kamehameha_charging[#player] then\n        if kamehameha_charging[#player] >= 20 then\n            FireKamehameha(player)\n        else\n            CONS_Printf(player, "Not charged enough!")\n        end\n        kamehameha_charging[#player] = nil\n    end\n    \n    kame_lastbutton[#player] = pressing\nend)\n\n`;
+            }
+            
+            if (includeSpirit) {
+                s += `-- Spirit Bomb Attack\nlocal function CreateSpiritBomb(player)\n    local mo = player.mo\n    if not mo or not mo.valid then return end\n    \n    local bomb = P_SpawnMobj(mo.x, mo.y, mo.z + 80*FRACUNIT, MT_THROWNGRENADE)\n    \n    if bomb and bomb.valid then\n        bomb.target = mo\n        bomb.fuse = 80\n        bomb.momz = 10*FRACUNIT\n        bomb.scale = 3*FRACUNIT\n        bomb.destscale = 4*FRACUNIT\n        \n        for i = 1, 12 do\n            local angle = FixedAngle((i * 30) * FRACUNIT)\n            local spark = P_SpawnMobj(\n                bomb.x + P_ReturnThrustX(nil, angle, 60*FRACUNIT),\n                bomb.y + P_ReturnThrustY(nil, angle, 60*FRACUNIT),\n                bomb.z,\n                MT_SONIC3KBOSSEXPLODE\n            )\n            if spark and spark.valid then\n                spark.color = SKINCOLOR_GOLD\n            end\n        end\n        \n        S_StartSound(mo, sfx_s3kb4)\n        CONS_Printf(player, "SPIRIT BOMB!")\n    end\nend\n\naddHook("PlayerThink", function(player)\n    if not (player and player.mo and player.mo.valid) then return end\n    \n    local pressing = (player.cmd.buttons & BT_${spiritKey.toUpperCase()})\n    local waspressing = spirit_lastbutton[#player]\n    \n    -- Just started holding\n    if pressing and not waspressing then\n        spirit_bomb_charging[#player] = 1\n        CONS_Printf(player, "Gathering energy...")\n    end\n    \n    -- Charging\n    if spirit_bomb_charging[#player] and pressing then\n        spirit_bomb_charging[#player] = $ + 1\n        \n        -- Slow down player while charging\n        player.mo.momx = $/3\n        player.mo.momy = $/3\n        \n        -- Visual charging effect\n        if spirit_bomb_charging[#player] % 4 == 0 then\n            local mo = player.mo\n            local angle = FixedAngle(P_RandomRange(0, 360) * FRACUNIT)\n            local dist = P_RandomRange(40, 80)\n            local spark = P_SpawnMobj(\n                mo.x + P_ReturnThrustX(nil, angle, dist*FRACUNIT),\n                mo.y + P_ReturnThrustY(nil, angle, dist*FRACUNIT),\n                mo.z + P_RandomRange(0, 72)*FRACUNIT,\n                MT_SONIC3KBOSSEXPLODE\n            )\n            if spark and spark.valid then\n                spark.color = SKINCOLOR_GOLD\n            end\n        end\n    end\n    \n    -- Released button\n    if not pressing and spirit_bomb_charging[#player] then\n        if spirit_bomb_charging[#player] >= 40 then\n            CreateSpiritBomb(player)\n        else\n            CONS_Printf(player, "Not charged enough!")\n        end\n        spirit_bomb_charging[#player] = nil\n    end\n    \n    spirit_lastbutton[#player] = pressing\nend)\n\n`;
+            }
+            
+            s += `print("\\\\x82${modName} loaded successfully!")\nprint("\\\\x82Hold button to charge, release to attack!")\nprint("\\\\x85Kamehameha: Hold until charged, then release!")\nprint("\\\\x84Spirit Bomb: Hold longer for more power!")\n`;
+            return s;
+        }
+        
+        function generateSOC(modName) {
+            return `# ${modName} SOC\n\nThing 68\nDeathSound = 0\nSpeed = 60\n\nThing 69\nRadius = 196608\nHeight = 393216\nSpeed = 25\n`;
+        }
+        
+        function downloadFile(content, filename) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+        
+        function downloadFiles() {
+            const status = document.getElementById('status');
+            const btn = document.querySelector('.download-btn');
+            
+            try {
+                status.className = 'status loading show';
+                status.textContent = '⏳ Generating files...';
+                btn.disabled = true;
+                
+                const modName = document.getElementById('modName').value || 'DBZ_Abilities';
+                const includeKame = document.getElementById('kamehameha').checked;
+                const includeSpirit = document.getElementById('spiritbomb').checked;
+                const kameKey = document.getElementById('kameKey').value;
+                const spiritKey = document.getElementById('spiritKey').value;
+                
+                if (!includeKame && !includeSpirit) {
+                    throw new Error('Select at least one ability!');
+                }
+                
+                const lua = generateLua(modName, includeKame, includeSpirit, kameKey, spiritKey);
+                const soc = generateSOC(modName);
+                
+                downloadFile(lua, modName + '.lua');
+                
+                setTimeout(() => {
+                    downloadFile(soc, modName + '.soc');
+                    
+                    status.className = 'status success show';
+                    status.textContent = '✅ Downloaded! Opening SRB2 web player...';
+                    btn.disabled = false;
+                    
+                    // Open SRB2 web version after download
+                    setTimeout(() => {
+                        window.open('https://vinmannie.github.io/srb2web/', '_blank');
+                    }, 1500);
+                }, 600);
+                
+            } catch (error) {
+                status.className = 'status error show';
+                status.textContent = '❌ ' + error.message;
+                btn.disabled = false;
+            }
+        }
+        
+        document.getElementById('kamehameha').addEventListener('change', function() {
+            document.getElementById('kamehamehaKey').style.display = this.checked ? 'block' : 'none';
+        });
+        
+        document.getElementById('spiritbomb').addEventListener('change', function() {
+            document.getElementById('spiritbombKey').style.display = this.checked ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>
