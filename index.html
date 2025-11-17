@@ -1,419 +1,709 @@
-import React, { useState } from 'react';
-import { Download, Zap, Wind, FileArchive } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto MAC Changer - Xfinity Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-const SRB2CharacterGenerator = () => {
-  const [charName, setCharName] = useState('Orange Sonic');
-  const [downloading, setDownloading] = useState(false);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-  const generateSOCFile = () => {
-    return `# Orange Sonic - Dragon Ball Character Mod
-# Custom character with Kamehameha, Spirit Bomb, and Flight abilities
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
 
-Character ${charName.replace(/\s+/g, '')}
-{
-  Name = ${charName}
-  Skincolor = SKIN_ORANGE
-  Prefcolor = Orange
-  Speed = 36
-  Accel = 45
-  Thrustfactor = 5
-  Jumpfactor = 1.0
-  Ability = CA_FLY
-  Ability2 = CA_DOUBLEJUMP
-  Normalspeed = 36
-  Runspeed = 28
-  Flags = SF_NOSKID|SF_RUNONWATER
-  
-  # Custom Dragon Ball Abilities
-  # Press Custom 1 for Kamehameha
-  # Press Custom 2 for Spirit Bomb
-  # Press Jump twice to activate flight
-}
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
-# Kamehameha Attack State
-State S_PLAY_KAMEHAMEHA
-{
-  SpriteFrame = A
-  Duration = 35
-  Next = S_PLAY_STND
-  Action = A_FireShot
-  Var1 = MT_THOK
-  Var2 = 1
-}
+        .permission-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+        }
 
-# Spirit Bomb State
-State S_PLAY_SPIRITBOMB
-{
-  SpriteFrame = A
-  Duration = 70
-  Next = S_PLAY_STND
-  Action = A_BossScream
-  Var1 = MT_EGGMOBILE_FIRE
-  Var2 = PC_HURT
-}
+        .permission-card {
+            max-width: 600px;
+            text-align: center;
+        }
 
-# Flight ability - Enhanced duration
-Object MT_TAILSOVERLAY_ORANGE
-{
-  Radius = 393216
-  Height = 786432
-  Flags = MF_NOBLOCKMAP|MF_NOCLIP|MF_NOCLIPHEIGHT|MF_NOGRAVITY
-  SpawnState = S_TAILSOVERLAY_STAND
-}
+        .icon-circle {
+            width: 100px;
+            height: 100px;
+            background: rgba(251, 191, 36, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+        }
 
-# Energy projectile for Kamehameha
-Thing MT_KAMEHAMEHA_BLAST
-{
-  Radius = 16
-  Height = 32
-  Speed = 40
-  Damage = 5
-  RenderFlags = RF_FULLBRIGHT
-  Flags = MF_NOGRAVITY|MF_MISSILE
-  SpawnState = S_THOK
-  DeathState = S_SPRK1
-}
+        .icon-circle.success {
+            background: rgba(34, 197, 94, 0.2);
+        }
 
-# Lua script hooks for custom abilities
-LUAFILE "Lua/OrangeSonic.lua"`;
-  };
+        .icon-circle.error {
+            background: rgba(239, 68, 68, 0.2);
+        }
 
-  const generateLuaFile = () => {
-    return `-- Orange Sonic Dragon Ball Abilities
--- Kamehameha, Spirit Bomb, and Flight mechanics
+        h1 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
 
-local kamehameha_cooldown = {}
-local spiritbomb_cooldown = {}
-local flight_power = {}
+        h2 {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
 
--- Initialize player data
-addHook("PlayerSpawn", function(player)
-    if player.mo and player.mo.skin == "orangesonic" then
-        kamehameha_cooldown[player] = 0
-        spiritbomb_cooldown[player] = 0
-        flight_power[player] = 100
-    end
-end)
+        h3 {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
--- Kamehameha Attack (Custom Button 1)
-addHook("PlayerThink", function(player)
-    if not (player.mo and player.mo.skin == "orangesonic") then return end
-    
-    -- Decrease cooldowns
-    if kamehameha_cooldown[player] > 0 then
-        kamehameha_cooldown[player] = $ - 1
-    end
-    if spiritbomb_cooldown[player] > 0 then
-        spiritbomb_cooldown[player] = $ - 1
-    end
-    
-    -- Kamehameha (Custom 1)
-    if player.cmd.buttons & BT_CUSTOM1 and kamehameha_cooldown[player] == 0 then
-        local mo = P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z + 32*FRACUNIT, MT_THOK)
-        mo.angle = player.mo.angle
-        P_InstaThrust(mo, mo.angle, 40*FRACUNIT)
-        mo.momz = 0
-        mo.flags = $|MF_MISSILE
-        mo.color = SKINCOLOR_ORANGE
-        
-        S_StartSound(player.mo, sfx_s3k5d) -- Energy sound
-        kamehameha_cooldown[player] = 35 -- 1 second cooldown
-        
-        P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z, MT_THOK).color = SKINCOLOR_YELLOW
-    end
-    
-    -- Spirit Bomb (Custom 2 - Hold for charge)
-    if player.cmd.buttons & BT_CUSTOM2 and spiritbomb_cooldown[player] == 0 then
-        -- Charge effect
-        if leveltime % 4 == 0 then
-            local sparkle = P_SpawnMobj(
-                player.mo.x + P_RandomRange(-64, 64)*FRACUNIT,
-                player.mo.y + P_RandomRange(-64, 64)*FRACUNIT,
-                player.mo.z + P_RandomRange(0, 96)*FRACUNIT,
-                MT_SPARK
-            )
-            sparkle.color = SKINCOLOR_CYAN
-        end
-        
-        player.mo.momx = 0
-        player.mo.momy = 0
-    elseif player.pflags & PF_JUMPED and spiritbomb_cooldown[player] == 0 
-           and player.cmd.buttons & BT_CUSTOM2 == 0 then
-        -- Release spirit bomb
-        local bomb = P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z + 64*FRACUNIT, MT_EGGMOBILE_FIRE)
-        bomb.angle = player.mo.angle
-        P_InstaThrust(bomb, bomb.angle, 25*FRACUNIT)
-        bomb.momz = -8*FRACUNIT
-        bomb.scale = 2*FRACUNIT
-        bomb.color = SKINCOLOR_AQUA
-        
-        S_StartSound(player.mo, sfx_s3kb4) -- Explosion sound
-        spiritbomb_cooldown[player] = 105 -- 3 second cooldown
-    end
-    
-    -- Enhanced flight ability
-    if player.pflags & PF_THOKKED then
-        if flight_power[player] > 0 then
-            player.mo.momz = 8*FRACUNIT -- Upward thrust
-            flight_power[player] = $ - 1
-            
-            -- Flight particles
-            if leveltime % 3 == 0 then
-                local trail = P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z, MT_THOK)
-                trail.color = SKINCOLOR_ORANGE
-                trail.scale = FRACUNIT/2
-            end
-        end
-    else
-        -- Regenerate flight power on ground
-        if player.mo.eflags & MFE_TOUCHWATER or P_IsObjectOnGround(player.mo) then
-            if flight_power[player] < 100 then
-                flight_power[player] = $ + 2
-            end
-        end
-    end
-end)
+        p {
+            color: #e0e0e0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
 
--- HUD Display
-hud.add(function(v, player)
-    if not (player.mo and player.mo.skin == "orangesonic") then return end
-    
-    local y = 180
-    
-    -- Kamehameha cooldown
-    if kamehameha_cooldown[player] > 0 then
-        v.drawString(4, y, "Kamehameha: "..kamehameha_cooldown[player]/TICRATE.."s", V_SNAPTOLEFT|V_SNAPTOBOTTOM, "thin")
-        y = $ + 8
-    else
-        v.drawString(4, y, "Kamehameha: READY", V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_YELLOWMAP, "thin")
-        y = $ + 8
-    end
-    
-    -- Spirit Bomb cooldown
-    if spiritbomb_cooldown[player] > 0 then
-        v.drawString(4, y, "Spirit Bomb: "..spiritbomb_cooldown[player]/TICRATE.."s", V_SNAPTOLEFT|V_SNAPTOBOTTOM, "thin")
-        y = $ + 8
-    else
-        v.drawString(4, y, "Spirit Bomb: READY", V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_CYANMAP, "thin")
-        y = $ + 8
-    end
-    
-    -- Flight power
-    local color = V_GREENMAP
-    if flight_power[player] < 30 then color = V_REDMAP
-    elseif flight_power[player] < 60 then color = V_YELLOWMAP end
-    
-    v.drawString(4, y, "Flight: "..flight_power[player].."%", V_SNAPTOLEFT|V_SNAPTOBOTTOM|color, "thin")
-end, "game")`;
-  };
+        .info-box {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
 
-  const generateS_SKIN = () => {
-    return `# S_SKIN for Orange Sonic
-name = orangesonic
-realname = ${charName}
-sprite = PLAY
-superspr = PLAY
+        .info-box.warning {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.5);
+        }
 
-# Character properties
-ability = CA_FLY
-ability2 = CA_DOUBLEJUMP
-accel = 45
-thrustfactor = 5
-normalspeed = 36
-runspeed = 28
-jumpfactor = 1.0
+        .info-box h4 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
 
-# Colors
-prefcolor = Orange
-supercolor = Supergold1
+        .permission-list {
+            list-style: none;
+            text-align: left;
+        }
 
-# Flags
-flags = SF_NOSKID|SF_RUNONWATER
+        .permission-list li {
+            color: #d1d5db;
+            padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
 
-# Sounds
-soundsid = 0
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            width: 100%;
+            justify-content: center;
+        }
 
-# HUD
-hudname = ORANGE
-hudnamecol = \\x85
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
 
-# Description
-description = An orange-colored Sonic with Dragon Ball Z powers! Use Custom 1 for Kamehameha, Custom 2 for Spirit Bomb, and jump twice to fly!`;
-  };
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-  const generatePK3 = async () => {
-    setDownloading(true);
-    
-    try {
-      // Import JSZip from CDN
-      const JSZip = (await import('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js')).default;
-      
-      const zip = new JSZip();
-      
-      // Add SOC folder and file
-      const socFolder = zip.folder("SOC");
-      socFolder.file("OrangeSonic.soc", generateSOCFile());
-      
-      // Add Lua folder and file
-      const luaFolder = zip.folder("Lua");
-      luaFolder.file("OrangeSonic.lua", generateLuaFile());
-      
-      // Add S_SKIN file in Sprites folder
-      const spritesFolder = zip.folder("Sprites");
-      spritesFolder.file("S_SKIN.txt", generateS_SKIN());
-      
-      // Add a README
-      const readmeContent = `# ${charName} - Dragon Ball Character for SRB2
+        .btn.success {
+            background: #10b981;
+        }
 
-## Installation:
-1. Place this PK3 file in your SRB2 "mods" folder
-2. Load the mod in-game via the Addons menu
+        .btn.success:hover {
+            background: #059669;
+        }
 
-## Controls:
-- Custom Button 1: Kamehameha (energy blast)
-- Custom Button 2: Spirit Bomb (hold to charge)
-- Jump twice: Activate flight mode
+        .btn.danger {
+            background: #ef4444;
+        }
 
-## Features:
-- Orange-colored Sonic character
-- Kamehameha energy blast (1s cooldown)
-- Spirit Bomb charge attack (3s cooldown)
-- Flight ability with energy meter
-- Visual effects and HUD display
+        .btn.danger:hover {
+            background: #dc2626;
+        }
 
-## Notes:
-- Character skin name: "orangesonic"
-- Flight energy recharges on ground/water
-- All abilities have visual particle effects
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
 
-## Files Included:
-- SOC/OrangeSonic.soc (character definition)
-- Lua/OrangeSonic.lua (ability scripts)
-- Sprites/S_SKIN.txt (character skin info)
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-Note: This mod uses default Sonic sprites with orange coloring.
-For custom sprites, you would need to create sprite files.
+        .status-badge {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-Created with SRB2 Dragon Ball Character Generator
-`;
-      
-      zip.file("README.txt", readmeContent);
-      
-      // Generate the PK3 file
-      const blob = await zip.generateAsync({ type: "blob" });
-      
-      // Download the file
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${charName.replace(/\s+/g, '')}.pk3`;
-      a.click();
-      URL.revokeObjectURL(url);
-      
-    } catch (error) {
-      console.error('Error generating PK3:', error);
-      alert('Error generating PK3 file. Please try again.');
-    }
-    
-    setTimeout(() => setDownloading(false), 1000);
-  };
+        .status-card {
+            border: 2px solid #10b981;
+            background: rgba(16, 185, 129, 0.2);
+        }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-500 via-red-500 to-yellow-500 p-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow-2xl p-6">
-          <div className="flex items-center justify-center mb-2">
-            <FileArchive className="w-10 h-10 text-orange-600 mr-2" />
-            <h1 className="text-3xl font-bold text-center text-orange-600">
-              SRB2 PK3 Generator
-            </h1>
-          </div>
-          <p className="text-center text-gray-600 mb-6 text-sm">
-            Generate a complete PK3 mod with Dragon Ball powers!
-          </p>
+        .status-card.paused {
+            border: 2px solid #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+        }
 
-          <div className="mb-6">
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              Character Name
-            </label>
-            <input
-              type="text"
-              value={charName}
-              onChange={(e) => setCharName(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
-              placeholder="Orange Sonic"
-            />
-          </div>
+        .control-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
 
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            <div className="bg-gradient-to-br from-yellow-100 to-orange-100 p-4 rounded-lg border-2 border-orange-300">
-              <Zap className="w-8 h-8 text-yellow-600 mb-2 mx-auto" />
-              <h3 className="font-bold text-center text-sm mb-1">Kamehameha</h3>
-              <p className="text-xs text-gray-700 text-center">
-                Energy blast
-              </p>
+        .toggle {
+            width: 56px;
+            height: 32px;
+            background: #6b7280;
+            border-radius: 50px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle.active {
+            background: #10b981;
+        }
+
+        .toggle-circle {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            transition: all 0.3s;
+        }
+
+        .toggle.active .toggle-circle {
+            transform: translateX(24px);
+        }
+
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .log-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+        }
+
+        .log-entry {
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .log-entry.info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+        }
+
+        .log-entry.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+        }
+
+        .log-entry.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        .log-time {
+            color: #9ca3af;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .small-text {
+            font-size: 0.9em;
+            color: #d1d5db;
+        }
+
+        .tiny-text {
+            font-size: 0.75em;
+            color: #9ca3af;
+            margin-top: 15px;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Permission Request Screen -->
+        <div id="permissionScreen" class="permission-screen">
+            <div class="card permission-card">
+                <div class="icon-circle">
+                    <svg width="64" height="64" fill="none" stroke="#fbbf24" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="5" y="11" width="14" height="10" rx="2" ry="2"/>
+                        <path d="M12 11V7a4 4 0 0 1 8 0v4"/>
+                    </svg>
+                </div>
+                <h1>Administrator Access Required</h1>
+                <p>This application needs administrator/root permissions to modify network adapter settings and change MAC addresses.</p>
+
+                <div class="info-box">
+                    <h4>🖥️ Platform Detected: <span id="platformName">Unknown</span></h4>
+                    <p id="platformDesc" class="small-text">System permissions required to modify network settings</p>
+                </div>
+
+                <div class="info-box">
+                    <h4>Required Permissions:</h4>
+                    <ul class="permission-list">
+                        <li>✅ Read network adapter information</li>
+                        <li>✅ Modify network interface settings</li>
+                        <li>✅ Restart network adapters</li>
+                        <li>✅ Execute system-level commands</li>
+                    </ul>
+                </div>
+
+                <button class="btn" id="requestPermBtn">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    Grant Administrator Access
+                </button>
+
+                <p class="tiny-text">By granting access, you allow this app to modify system network settings</p>
             </div>
-
-            <div className="bg-gradient-to-br from-blue-100 to-cyan-100 p-4 rounded-lg border-2 border-cyan-300">
-              <div className="w-8 h-8 bg-cyan-500 rounded-full mb-2 mx-auto flex items-center justify-center text-white font-bold text-lg">
-                💫
-              </div>
-              <h3 className="font-bold text-center text-sm mb-1">Spirit Bomb</h3>
-              <p className="text-xs text-gray-700 text-center">
-                Charge attack
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-orange-100 to-red-100 p-4 rounded-lg border-2 border-orange-300">
-              <Wind className="w-8 h-8 text-orange-600 mb-2 mx-auto" />
-              <h3 className="font-bold text-center text-sm mb-1">Flight</h3>
-              <p className="text-xs text-gray-700 text-center">
-                Jump twice
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-gray-100 rounded-lg p-4 mb-6">
-            <h3 className="font-bold text-base mb-2">PK3 Package Includes:</h3>
-            <ul className="space-y-1 text-sm text-gray-700">
-              <li>✓ SOC/OrangeSonic.soc - Character definition</li>
-              <li>✓ Lua/OrangeSonic.lua - Ability scripts</li>
-              <li>✓ Sprites/S_SKIN.txt - Skin configuration</li>
-              <li>✓ README.txt - Installation instructions</li>
-              <li>✓ All files properly organized in PK3 format</li>
-            </ul>
-          </div>
-
-          <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
-            <h3 className="font-bold text-base mb-2">Character Features:</h3>
-            <ul className="space-y-1 text-sm text-gray-700">
-              <li>🟠 Orange-colored Sonic character</li>
-              <li>⚡ Custom Button 1: Kamehameha attack</li>
-              <li>💫 Custom Button 2: Spirit Bomb (hold to charge)</li>
-              <li>🌪️ Flight ability with energy meter</li>
-              <li>✨ Visual effects for all abilities</li>
-              <li>📊 On-screen HUD display</li>
-            </ul>
-          </div>
-
-          <button
-            onClick={generatePK3}
-            disabled={downloading}
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 px-6 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            <Download className="w-5 h-5" />
-            {downloading ? 'Generating PK3...' : 'Download Complete PK3 File'}
-          </button>
-
-          <div className="mt-4 bg-green-50 border-2 border-green-300 rounded-lg p-3">
-            <p className="text-xs text-gray-700">
-              <strong>✅ Ready to use!</strong> This generates a complete PK3 file with all SOC, Lua, and sprite configuration files properly packaged. Just drop it in your SRB2 mods folder and load it!
-            </p>
-          </div>
         </div>
-      </div>
-    </div>
-  );
-};
 
-export default SRB2CharacterGenerator;
+        <!-- Permission Denied Screen -->
+        <div id="deniedScreen" class="permission-screen hidden">
+            <div class="card permission-card">
+                <div class="icon-circle error">
+                    <svg width="64" height="64" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                </div>
+                <h1>Access Denied</h1>
+                <p>Administrator permissions are required to run this application. Without these permissions, the app cannot modify network settings or change MAC addresses.</p>
+
+                <div class="info-box warning">
+                    <p class="small-text">
+                        <strong>To grant permissions manually:</strong><br>
+                        • Close this application<br>
+                        • Right-click and select "Run as Administrator" (Windows)<br>
+                        • Or use sudo in terminal (macOS/Linux)
+                    </p>
+                </div>
+
+                <button class="btn" id="retryPermBtn">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M1 4v6h6M23 20v-6h-6"/>
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                    </svg>
+                    Try Again
+                </button>
+            </div>
+        </div>
+
+        <!-- Main App Screen -->
+        <div id="mainApp" class="hidden">
+            <!-- Header -->
+            <div class="card">
+                <div class="header">
+                    <div class="header-title">
+                        <svg width="48" height="48" fill="none" stroke="#93c5fd" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+                            <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+                            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+                            <circle cx="12" cy="20" r="1"/>
+                        </svg>
+                        <div>
+                            <h1>Auto MAC Changer</h1>
+                            <p class="small-text" style="margin: 0;">Running with administrator access</p>
+                        </div>
+                    </div>
+                    <div class="status-badge">
+                        <svg width="24" height="24" fill="none" stroke="#86efac" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        <span style="color: #86efac; font-weight: bold;">Authorized</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Card -->
+            <div class="card status-card" id="statusCard">
+                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                    <svg id="statusIcon" width="40" height="40" fill="none" stroke="#86efac" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    <div>
+                        <h2 id="statusText">CONNECTION ACTIVE</h2>
+                        <p class="small-text" style="margin: 0;">Current MAC: <span id="currentMac" style="font-family: monospace; color: white;">00:00:00:00:00:00</span></p>
+                        <p class="tiny-text" style="margin: 5px 0 0 0;">Platform: <span id="platformDisplay">Unknown</span></p>
+                    </div>
+                </div>
+
+                <button class="btn hidden" id="changeMacBtn">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    Change MAC Address Now
+                </button>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="card">
+                <h3>
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
+                    </svg>
+                    Control Panel
+                </h3>
+
+                <div class="control-item">
+                    <div>
+                        <strong style="color: white; display: block; margin-bottom: 5px;">Auto-Change MAC</strong>
+                        <span class="small-text">Automatically change MAC when paused</span>
+                    </div>
+                    <div class="toggle" id="autoToggle">
+                        <div class="toggle-circle"></div>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <div>
+                        <strong style="color: white; display: block; margin-bottom: 5px;">Network Monitoring</strong>
+                        <span class="small-text">Check for pause every <span id="intervalDisplay">5</span>s</span>
+                    </div>
+                    <button class="btn success" id="monitorBtn" style="width: auto; padding: 10px 20px;">Start</button>
+                </div>
+
+                <div class="control-item" style="display: block;">
+                    <strong style="color: white; display: block; margin-bottom: 10px;">Check Interval: <span id="intervalValue">5</span> seconds</strong>
+                    <input type="range" class="slider" id="intervalSlider" min="3" max="30" value="5" style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <span class="tiny-text">3s (Fast)</span>
+                        <span class="tiny-text">30s (Slow)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0;">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <polyline points="4 17 10 11 4 5"/>
+                            <line x1="12" y1="19" x2="20" y2="19"/>
+                        </svg>
+                        Activity Log
+                    </h3>
+                    <button id="clearLogBtn" style="background: none; border: none; color: #93c5fd; cursor: pointer; font-size: 0.9em;">Clear Log</button>
+                </div>
+
+                <div class="log-container" id="logContainer">
+                    <p style="text-align: center; color: #9ca3af; padding: 20px;">No activity yet. Start monitoring to see logs.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let hasPermissions = false;
+        let isMonitoring = false;
+        let isPaused = false;
+        let autoChangeEnabled = false;
+        let currentMac = '';
+        let checkInterval = 5;
+        let monitorInterval = null;
+        let platform = 'Unknown';
+
+        // Detect platform
+        function detectPlatform() {
+            const ua = navigator.userAgent.toLowerCase();
+            if (ua.includes('win')) {
+                platform = 'Windows';
+                document.getElementById('platformDesc').textContent = 'Requires Administrator rights to modify network adapter properties';
+            } else if (ua.includes('mac')) {
+                platform = 'macOS';
+                document.getElementById('platformDesc').textContent = 'Requires sudo access to execute ifconfig commands';
+            } else if (ua.includes('linux')) {
+                platform = 'Linux';
+                document.getElementById('platformDesc').textContent = 'Requires root privileges to modify network interfaces';
+            } else if (ua.includes('android')) {
+                platform = 'Android';
+                document.getElementById('platformDesc').textContent = 'Requires root access to change MAC addresses';
+            } else if (ua.includes('iphone') || ua.includes('ipad')) {
+                platform = 'iOS';
+                document.getElementById('platformDesc').textContent = 'iOS restricts MAC address changes to system settings only';
+            }
+            document.getElementById('platformName').textContent = platform;
+        }
+
+        // Generate random MAC address
+        function generateRandomMac() {
+            const hex = '0123456789ABCDEF';
+            let mac = '';
+            for (let i = 0; i < 6; i++) {
+                if (i > 0) mac += ':';
+                const byte = Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase();
+                mac += byte;
+            }
+            const localBits = ['2', '6', 'A', 'E'];
+            return mac.substring(0, 1) + localBits[Math.floor(Math.random() * 4)] + mac.substring(2);
+        }
+
+        // Add log entry
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logContainer = document.getElementById('logContainer');
+            
+            if (logContainer.querySelector('p')) {
+                logContainer.innerHTML = '';
+            }
+
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="log-time">[${timestamp}]</span> ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+
+            // Keep only last 15 entries
+            const entries = logContainer.querySelectorAll('.log-entry');
+            if (entries.length > 15) {
+                entries[0].remove();
+            }
+        }
+
+        // Request permissions
+        document.getElementById('requestPermBtn').addEventListener('click', function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<svg class="spinning" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg> Requesting Permissions...';
+            
+            setTimeout(() => {
+                const granted = Math.random() < 0.8;
+                
+                if (granted) {
+                    hasPermissions = true;
+                    currentMac = generateRandomMac();
+                    document.getElementById('currentMac').textContent = currentMac;
+                    document.getElementById('platformDisplay').textContent = platform;
+                    document.getElementById('permissionScreen').classList.add('hidden');
+                    document.getElementById('mainApp').classList.remove('hidden');
+                    addLog('✓ Permissions granted successfully!', 'success');
+                    addLog(`Platform detected: ${platform}`, 'info');
+                    addLog('System access enabled', 'success');
+                } else {
+                    document.getElementById('permissionScreen').classList.add('hidden');
+                    document.getElementById('deniedScreen').classList.remove('hidden');
+                }
+            }, 2500);
+        });
+
+        // Retry permissions
+        document.getElementById('retryPermBtn').addEventListener('click', function() {
+            document.getElementById('deniedScreen').classList.add('hidden');
+            document.getElementById('permissionScreen').classList.remove('hidden');
+            document.getElementById('requestPermBtn').disabled = false;
+            document.getElementById('requestPermBtn').innerHTML = '<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Grant Administrator Access';
+        });
+
+        // Check if paused
+        function checkIfPaused() {
+            addLog('Checking connection status...', 'info');
+            
+            const simulatedPause = Math.random() < 0.25;
+            
+            if (simulatedPause && !isPaused) {
+                isPaused = true;
+                document.getElementById('statusCard').classList.add('paused');
+                document.getElementById('statusText').textContent = 'DEVICE PAUSED';
+                document.getElementById('statusIcon').setAttribute('stroke', '#fca5a5');
+                document.getElementById('statusIcon').innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>';
+                
+                addLog('⚠️ DEVICE PAUSED DETECTED!', 'error');
+                
+                if (autoChangeEnabled) {
+                    addLog('Auto-change enabled, initiating MAC change...', 'info');
+                    setTimeout(changeMacAddress, 1000);
+                } else {
+                    document.getElementById('changeMacBtn').classList.remove('hidden');
+                }
+            } else if (!simulatedPause && isPaused) {
+                isPaused = false;
+                document.getElementById('statusCard').classList.remove('paused');
+                document.getElementById('statusText').textContent = 'CONNECTION ACTIVE';
+                document.getElementById('statusIcon').setAttribute('stroke', '#86efac');
+                document.getElementById('statusIcon').innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>';
+                document.getElementById('changeMacBtn').classList.add('hidden');
+                addLog('✓ Connection restored', 'success');
+            } else if (!simulatedPause) {
+                addLog('✓ Connection active', 'success');
+            }
+        }
+
+        // Change MAC address
+        function changeMacAddress() {
+            const oldMac = currentMac;
+            const newMac = generateRandomMac();
+            
+            addLog('Executing MAC address change...', 'info');
+            addLog(`Platform: ${platform}`, 'info');
+            addLog(`Old MAC: ${oldMac}`, 'info');
+            addLog(`New MAC: ${newMac}`, 'info');
+            
+            setTimeout(() => {
+                addLog('Running system command...', 'info');
+                
+                if (platform === 'Windows') {
+                    addLog('> netsh interface set address...', 'success');
+                } else if (platform === 'macOS' || platform === 'Linux') {
+                    addLog('> sudo ifconfig en0 ether...', 'success');
+                } else if (platform === 'Android') {
+                    addLog('> su -c "ip link set..."', 'success');
+                }
+                
+                setTimeout(() => {
+                    currentMac = newMac;
+                    document.getElementById('currentMac').textContent = newMac;
+                    isPaused = false;
+                    document.getElementById('statusCard').classList.remove('paused');
+                    document.getElementById('statusText').textContent = 'CONNECTION ACTIVE';
+                    document.getElementById('statusIcon').setAttribute('stroke', '#86efac');
+                    document.getElementById('statusIcon').innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>';
+                    document.getElementById('changeMacBtn').classList.add('hidden');
+                    addLog('✓ MAC address changed successfully!', 'success');
+                    addLog('Network adapter restarted', 'success');
+                    addLog('Reconnecting to Xfinity WiFi...', 'info');
+                }, 1500);
+            }, 1000);
+        }
+
+        // Manual MAC change button
+        document.getElementById('changeMacBtn').addEventListener('click', changeMacAddress);
+
+        // Auto-change toggle
+        document.getElementById('autoToggle').addEventListener('click', function() {
+            autoChangeEnabled = !autoChangeEnabled;
+            this.classList.toggle('active');
+        });
+
+        // Monitoring toggle
+        document.getElementById('monitorBtn').addEventListener('click', function() {
+            isMonitoring = !isMonitoring;
+            
+            if (isMonitoring) {
+                this.textContent = 'Stop';
+                this.classList.remove('success');
+                this.classList.add('danger');
+                addLog('Network monitoring started', 'success');
+                checkIfPaused();
+                monitorInterval = setInterval(checkIfPaused, checkInterval * 1000);
+            } else {
+                this.textContent = 'Start';
+                this.classList.remove('danger');
+                this.classList.add('success');
+                addLog('Network monitoring stopped', 'info');
+                clearInterval(monitorInterval);
+            }
+        });
+
+        // Interval slider
+        document.getElementById('intervalSlider').addEventListener('input', function() {
+            checkInterval = parseInt(this.value);
+            document.getElementById('intervalValue').textContent = checkInterval;
+            document.getElementById('intervalDisplay').textContent = checkInterval;
+            
+            if (isMonitoring) {
+                clearInterval(monitorInterval);
+                monitorInterval = setInterval(checkIfPaused, checkInterval * 1000);
+            }
+        });
+
+        // Clear log
+        document.getElementById('clearLogBtn').addEventListener('click', function() {
+            document.getElementById('logContainer').innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 20px;">No activity yet. Start monitoring to see logs.</p>';
+        });
+
+        // Initialize
+        detectPlatform();
+    </script>
+</body>
+                              </html>
