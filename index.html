@@ -1,330 +1,371 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRB2 PK3 Generator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #ff6b35, #f7931e, #c44569);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-        }
-        
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #333;
-            font-size: 16px;
-        }
-        
-        input[type="text"], select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        
-        .ability-box {
-            background: #f0f8ff;
-            border: 3px solid #4a90e2;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .ability-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        input[type="checkbox"] {
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-        }
-        
-        .ability-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .ability-desc {
-            color: #666;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-        
-        .download-btn {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
-        }
-        
-        .download-btn:active {
-            transform: scale(0.98);
-        }
-        
-        .download-btn:disabled {
-            opacity: 0.5;
-        }
-        
-        .instructions {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
-        
-        .instructions h3 {
-            margin-bottom: 10px;
-            color: #856404;
-        }
-        
-        .instructions ol {
-            margin-left: 20px;
-            color: #856404;
-        }
-        
-        .instructions li {
-            margin-bottom: 8px;
-        }
-        
-        .status {
-            text-align: center;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 18px;
-            display: none;
-        }
-        
-        .status.show {
-            display: block;
-        }
-        
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 2px solid #c3e6cb;
-        }
-        
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 2px solid #f5c6cb;
-        }
-        
-        .status.loading {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 2px solid #bee5eb;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🔥 SRB2 PK3 Generator</h1>
-        <p class="subtitle">Create Dragon Ball Z Mods</p>
-        
-        <label for="modName">Mod Name:</label>
-        <input type="text" id="modName" value="DBZ_Abilities" placeholder="Enter mod name">
-        
-        <div class="ability-box">
-            <div class="ability-header">
-                <input type="checkbox" id="kamehameha" checked>
-                <span class="ability-title">💥 Kamehameha</span>
-            </div>
-            <p class="ability-desc">Just HOLD the button to charge cyan energy, release to fire beam!</p>
-            <div id="kamehamehaKey">
-                <label>Button:</label>
-                <select id="kameKey">
-                    <option value="Tossflag">Toss Flag Button (Most Reliable!)</option>
-                    <option value="Jump">Jump Button</option>
-                    <option value="Spin">Spin Button</option>
-                    <option value="Custom1">Custom 1</option>
-                    <option value="Custom2">Custom 2</option>
-                    <option value="Custom3">Custom 3</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="ability-box">
-            <div class="ability-header">
-                <input type="checkbox" id="spiritbomb" checked>
-                <span class="ability-title">🌟 Spirit Bomb</span>
-            </div>
-            <p class="ability-desc">Just HOLD the button to gather gold energy, release massive sphere!</p>
-            <div id="spiritbombKey">
-                <label>Button:</label>
-                <select id="spiritKey">
-                    <option value="Firenormal">Fire Normal (Most Reliable!)</option>
-                    <option value="Jump">Jump Button</option>
-                    <option value="Spin">Spin Button</option>
-                    <option value="Custom1">Custom 1</option>
-                    <option value="Custom2">Custom 2</option>
-                    <option value="Custom3">Custom 3</option>
-                </select>
-            </div>
-        </div>
-        
-        <button class="download-btn" onclick="downloadFiles()">⬇️ DOWNLOAD FILES</button>
-        
-        <div id="status" class="status"></div>
-        
-        <div class="instructions">
-            <h3>📱 Instructions:</h3>
-            <ol>
-                <li>Tap "DOWNLOAD FILES" - you'll get 2 files (.lua and .soc)</li>
-                <li>Find them in your Downloads folder</li>
-                <li>Use a ZIP app (like ZArchiver) to create a ZIP with both files</li>
-                <li>Rename the .zip file to .pk3</li>
-                <li>Copy to SRB2 folder and load in game!</li>
-            </ol>
-        </div>
-        
-        <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px; border: 2px solid #2196F3;">
-            <h3 style="color: #1976d2; margin-bottom: 10px;">💡 How to Save This Page:</h3>
-            <ol style="margin-left: 20px; color: #1976d2;">
-                <li>Tap the 3 dots (⋮) in your browser</li>
-                <li>Select "Download" or "Save page"</li>
-                <li>Save as "srb2generator.html"</li>
-                <li>Open the saved file anytime!</li>
-            </ol>
-        </div>
-    </div>
+import React, { useState } from 'react';
+import { Download, Zap, Wind } from 'lucide-react';
 
-    <script>
-        function generateLua(modName, includeKame, includeSpirit, kameKey, spiritKey) {
-            let s = `-- ${modName} for SRB2\n-- Dragon Ball Z Abilities Mod\n\nlocal kamehameha_charging = {}\nlocal spirit_bomb_charging = {}\nlocal kame_lastbutton = {}\nlocal spirit_lastbutton = {}\n\n`;
+const SRB2CharacterGenerator = () => {
+  const [charName, setCharName] = useState('Orange Sonic');
+  const [downloading, setDownloading] = useState(false);
+
+  const generateSOCFile = () => {
+    return `# Orange Sonic - Dragon Ball Character Mod
+# Custom character with Kamehameha, Spirit Bomb, and Flight abilities
+
+Character ${charName.replace(/\s+/g, '')}
+{
+  Name = ${charName}
+  Skincolor = SKIN_ORANGE
+  Prefcolor = Orange
+  Speed = 36
+  Accel = 45
+  Thrustfactor = 5
+  Jumpfactor = 1.0
+  Ability = CA_FLY
+  Ability2 = CA_DOUBLEJUMP
+  Normalspeed = 36
+  Runspeed = 28
+  Flags = SF_NOSKID|SF_RUNONWATER
+  
+  # Custom Dragon Ball Abilities
+  # Press Custom 1 for Kamehameha
+  # Press Custom 2 for Spirit Bomb
+  # Press Jump twice to activate flight
+}
+
+# Kamehameha Attack State
+State S_PLAY_KAMEHAMEHA
+{
+  SpriteFrame = A
+  Duration = 35
+  Next = S_PLAY_STND
+  Action = A_FireShot
+  Var1 = MT_THOK
+  Var2 = 1
+}
+
+# Spirit Bomb State
+State S_PLAY_SPIRITBOMB
+{
+  SpriteFrame = A
+  Duration = 70
+  Next = S_PLAY_STND
+  Action = A_BossScream
+  Var1 = MT_EGGMOBILE_FIRE
+  Var2 = PC_HURT
+}
+
+# Flight ability - Enhanced duration
+Object MT_TAILSOVERLAY_ORANGE
+{
+  Radius = 393216
+  Height = 786432
+  Flags = MF_NOBLOCKMAP|MF_NOCLIP|MF_NOCLIPHEIGHT|MF_NOGRAVITY
+  SpawnState = S_TAILSOVERLAY_STAND
+}
+
+# Energy projectile for Kamehameha
+Thing MT_KAMEHAMEHA_BLAST
+{
+  Radius = 16
+  Height = 32
+  Speed = 40
+  Damage = 5
+  RenderFlags = RF_FULLBRIGHT
+  Flags = MF_NOGRAVITY|MF_MISSILE
+  SpawnState = S_THOK
+  DeathState = S_SPRK1
+}
+
+# Lua script hooks for custom abilities
+LUAFILE "Lua/OrangeSonic.lua"`;
+  };
+
+  const generateLuaFile = () => {
+    return `-- Orange Sonic Dragon Ball Abilities
+-- Kamehameha, Spirit Bomb, and Flight mechanics
+
+local kamehameha_cooldown = {}
+local spiritbomb_cooldown = {}
+local flight_power = {}
+
+-- Initialize player data
+addHook("PlayerSpawn", function(player)
+    if player.mo and player.mo.skin == "orangesonic" then
+        kamehameha_cooldown[player] = 0
+        spiritbomb_cooldown[player] = 0
+        flight_power[player] = 100
+    end
+end)
+
+-- Kamehameha Attack (Custom Button 1)
+addHook("PlayerThink", function(player)
+    if not (player.mo and player.mo.skin == "orangesonic") then return end
+    
+    -- Decrease cooldowns
+    if kamehameha_cooldown[player] > 0 then
+        kamehameha_cooldown[player] = $ - 1
+    end
+    if spiritbomb_cooldown[player] > 0 then
+        spiritbomb_cooldown[player] = $ - 1
+    end
+    
+    -- Kamehameha (Custom 1)
+    if player.cmd.buttons & BT_CUSTOM1 and kamehameha_cooldown[player] == 0 then
+        local mo = P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z + 32*FRACUNIT, MT_THOK)
+        mo.angle = player.mo.angle
+        P_InstaThrust(mo, mo.angle, 40*FRACUNIT)
+        mo.momz = 0
+        mo.flags = $|MF_MISSILE
+        mo.color = SKINCOLOR_ORANGE
+        
+        S_StartSound(player.mo, sfx_s3k5d) -- Energy sound
+        kamehameha_cooldown[player] = 35 -- 1 second cooldown
+        
+        P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z, MT_THOK).color = SKINCOLOR_YELLOW
+    end
+    
+    -- Spirit Bomb (Custom 2 - Hold for charge)
+    if player.cmd.buttons & BT_CUSTOM2 and spiritbomb_cooldown[player] == 0 then
+        -- Charge effect
+        if leveltime % 4 == 0 then
+            local sparkle = P_SpawnMobj(
+                player.mo.x + P_RandomRange(-64, 64)*FRACUNIT,
+                player.mo.y + P_RandomRange(-64, 64)*FRACUNIT,
+                player.mo.z + P_RandomRange(0, 96)*FRACUNIT,
+                MT_SPARK
+            )
+            sparkle.color = SKINCOLOR_CYAN
+        end
+        
+        player.mo.momx = 0
+        player.mo.momy = 0
+    elseif player.pflags & PF_JUMPED and spiritbomb_cooldown[player] == 0 
+           and player.cmd.buttons & BT_CUSTOM2 == 0 then
+        -- Release spirit bomb
+        local bomb = P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z + 64*FRACUNIT, MT_EGGMOBILE_FIRE)
+        bomb.angle = player.mo.angle
+        P_InstaThrust(bomb, bomb.angle, 25*FRACUNIT)
+        bomb.momz = -8*FRACUNIT
+        bomb.scale = 2*FRACUNIT
+        bomb.color = SKINCOLOR_AQUA
+        
+        S_StartSound(player.mo, sfx_s3kb4) -- Explosion sound
+        spiritbomb_cooldown[player] = 105 -- 3 second cooldown
+    end
+    
+    -- Enhanced flight ability
+    if player.pflags & PF_THOKKED then
+        if flight_power[player] > 0 then
+            player.mo.momz = 8*FRACUNIT -- Upward thrust
+            flight_power[player] = $ - 1
             
-            if (includeKame) {
-                s += `-- Kamehameha Attack\nlocal function FireKamehameha(player)\n    local mo = player.mo\n    if not mo or not mo.valid then return end\n    \n    local proj = P_SpawnMobj(\n        mo.x + P_ReturnThrustX(mo, mo.angle, 64*FRACUNIT),\n        mo.y + P_ReturnThrustY(mo, mo.angle, 64*FRACUNIT),\n        mo.z + 32*FRACUNIT,\n        MT_REDRING\n    )\n    \n    if proj and proj.valid then\n        proj.angle = mo.angle\n        proj.target = mo\n        proj.color = SKINCOLOR_CYAN\n        P_InstaThrust(proj, mo.angle, 80*FRACUNIT)\n        proj.momz = 0\n        \n        for i = 1, 3 do\n            local spark = P_SpawnMobj(proj.x, proj.y, proj.z + (i*8*FRACUNIT), MT_SONIC3KBOSSEXPLODE)\n            if spark and spark.valid then\n                spark.color = SKINCOLOR_CYAN\n            end\n        end\n        \n        S_StartSound(mo, sfx_wepfir)\n        CONS_Printf(player, "KAMEHAMEHA!")\n    end\nend\n\naddHook("PlayerThink", function(player)\n    if not (player and player.mo and player.mo.valid) then return end\n    \n    local pressing = (player.cmd.buttons & BT_${kameKey.toUpperCase()})\n    local waspressing = kame_lastbutton[#player]\n    \n    -- Just started holding\n    if pressing and not waspressing then\n        kamehameha_charging[#player] = 1\n        CONS_Printf(player, "Charging Kamehameha...")\n    end\n    \n    -- Charging\n    if kamehameha_charging[#player] and pressing then\n        kamehameha_charging[#player] = $ + 1\n        \n        -- Visual charging effect\n        if kamehameha_charging[#player] % 5 == 0 then\n            local mo = player.mo\n            local spark = P_SpawnMobj(\n                mo.x + P_RandomRange(-40, 40)*FRACUNIT,\n                mo.y + P_RandomRange(-40, 40)*FRACUNIT,\n                mo.z + P_RandomRange(0, 56)*FRACUNIT,\n                MT_SONIC3KBOSSEXPLODE\n            )\n            if spark and spark.valid then\n                spark.color = SKINCOLOR_CYAN\n            end\n        end\n    end\n    \n    -- Released button\n    if not pressing and kamehameha_charging[#player] then\n        if kamehameha_charging[#player] >= 20 then\n            FireKamehameha(player)\n        else\n            CONS_Printf(player, "Not charged enough!")\n        end\n        kamehameha_charging[#player] = nil\n    end\n    \n    kame_lastbutton[#player] = pressing\nend)\n\n`;
-            }
-            
-            if (includeSpirit) {
-                s += `-- Spirit Bomb Attack\nlocal function CreateSpiritBomb(player)\n    local mo = player.mo\n    if not mo or not mo.valid then return end\n    \n    local bomb = P_SpawnMobj(mo.x, mo.y, mo.z + 80*FRACUNIT, MT_THROWNGRENADE)\n    \n    if bomb and bomb.valid then\n        bomb.target = mo\n        bomb.fuse = 80\n        bomb.momz = 10*FRACUNIT\n        bomb.scale = 3*FRACUNIT\n        bomb.destscale = 4*FRACUNIT\n        \n        for i = 1, 12 do\n            local angle = FixedAngle((i * 30) * FRACUNIT)\n            local spark = P_SpawnMobj(\n                bomb.x + P_ReturnThrustX(nil, angle, 60*FRACUNIT),\n                bomb.y + P_ReturnThrustY(nil, angle, 60*FRACUNIT),\n                bomb.z,\n                MT_SONIC3KBOSSEXPLODE\n            )\n            if spark and spark.valid then\n                spark.color = SKINCOLOR_GOLD\n            end\n        end\n        \n        S_StartSound(mo, sfx_s3kb4)\n        CONS_Printf(player, "SPIRIT BOMB!")\n    end\nend\n\naddHook("PlayerThink", function(player)\n    if not (player and player.mo and player.mo.valid) then return end\n    \n    local pressing = (player.cmd.buttons & BT_${spiritKey.toUpperCase()})\n    local waspressing = spirit_lastbutton[#player]\n    \n    -- Just started holding\n    if pressing and not waspressing then\n        spirit_bomb_charging[#player] = 1\n        CONS_Printf(player, "Gathering energy...")\n    end\n    \n    -- Charging\n    if spirit_bomb_charging[#player] and pressing then\n        spirit_bomb_charging[#player] = $ + 1\n        \n        -- Slow down player while charging\n        player.mo.momx = $/3\n        player.mo.momy = $/3\n        \n        -- Visual charging effect\n        if spirit_bomb_charging[#player] % 4 == 0 then\n            local mo = player.mo\n            local angle = FixedAngle(P_RandomRange(0, 360) * FRACUNIT)\n            local dist = P_RandomRange(40, 80)\n            local spark = P_SpawnMobj(\n                mo.x + P_ReturnThrustX(nil, angle, dist*FRACUNIT),\n                mo.y + P_ReturnThrustY(nil, angle, dist*FRACUNIT),\n                mo.z + P_RandomRange(0, 72)*FRACUNIT,\n                MT_SONIC3KBOSSEXPLODE\n            )\n            if spark and spark.valid then\n                spark.color = SKINCOLOR_GOLD\n            end\n        end\n    end\n    \n    -- Released button\n    if not pressing and spirit_bomb_charging[#player] then\n        if spirit_bomb_charging[#player] >= 40 then\n            CreateSpiritBomb(player)\n        else\n            CONS_Printf(player, "Not charged enough!")\n        end\n        spirit_bomb_charging[#player] = nil\n    end\n    \n    spirit_lastbutton[#player] = pressing\nend)\n\n`;
-            }
-            
-            s += `print("\\\\x82${modName} loaded successfully!")\nprint("\\\\x82Hold button to charge, release to attack!")\nprint("\\\\x85Kamehameha: Hold until charged, then release!")\nprint("\\\\x84Spirit Bomb: Hold longer for more power!")\n`;
-            return s;
-        }
-        
-        function generateSOC(modName) {
-            return `# ${modName} SOC\n\nThing 68\nDeathSound = 0\nSpeed = 60\n\nThing 69\nRadius = 196608\nHeight = 393216\nSpeed = 25\n`;
-        }
-        
-        function downloadFile(content, filename) {
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
-        }
-        
-        function downloadFiles() {
-            const status = document.getElementById('status');
-            const btn = document.querySelector('.download-btn');
-            
-            try {
-                status.className = 'status loading show';
-                status.textContent = '⏳ Generating files...';
-                btn.disabled = true;
-                
-                const modName = document.getElementById('modName').value || 'DBZ_Abilities';
-                const includeKame = document.getElementById('kamehameha').checked;
-                const includeSpirit = document.getElementById('spiritbomb').checked;
-                const kameKey = document.getElementById('kameKey').value;
-                const spiritKey = document.getElementById('spiritKey').value;
-                
-                if (!includeKame && !includeSpirit) {
-                    throw new Error('Select at least one ability!');
-                }
-                
-                const lua = generateLua(modName, includeKame, includeSpirit, kameKey, spiritKey);
-                const soc = generateSOC(modName);
-                
-                downloadFile(lua, modName + '.lua');
-                
-                setTimeout(() => {
-                    downloadFile(soc, modName + '.soc');
-                    
-                    status.className = 'status success show';
-                    status.textContent = '✅ Downloaded! Opening SRB2 web player...';
-                    btn.disabled = false;
-                    
-                    // Open SRB2 web version after download
-                    setTimeout(() => {
-                        window.open('https://vinmannie.github.io/srb2web/', '_blank');
-                    }, 1500);
-                }, 600);
-                
-            } catch (error) {
-                status.className = 'status error show';
-                status.textContent = '❌ ' + error.message;
-                btn.disabled = false;
-            }
-        }
-        
-        document.getElementById('kamehameha').addEventListener('change', function() {
-            document.getElementById('kamehamehaKey').style.display = this.checked ? 'block' : 'none';
-        });
-        
-        document.getElementById('spiritbomb').addEventListener('change', function() {
-            document.getElementById('spiritbombKey').style.display = this.checked ? 'block' : 'none';
-        });
-    </script>
-</body>
-</html>
+            -- Flight particles
+            if leveltime % 3 == 0 then
+                local trail = P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z, MT_THOK)
+                trail.color = SKINCOLOR_ORANGE
+                trail.scale = FRACUNIT/2
+            end
+        end
+    else
+        -- Regenerate flight power on ground
+        if player.mo.eflags & MFE_TOUCHWATER or P_IsObjectOnGround(player.mo) then
+            if flight_power[player] < 100 then
+                flight_power[player] = $ + 2
+            end
+        end
+    end
+end)
+
+-- HUD Display
+hud.add(function(v, player)
+    if not (player.mo and player.mo.skin == "orangesonic") then return end
+    
+    local y = 180
+    
+    -- Kamehameha cooldown
+    if kamehameha_cooldown[player] > 0 then
+        v.drawString(4, y, "Kamehameha: "..kamehameha_cooldown[player]/TICRATE.."s", V_SNAPTOLEFT|V_SNAPTOBOTTOM, "thin")
+        y = $ + 8
+    else
+        v.drawString(4, y, "Kamehameha: READY", V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_YELLOWMAP, "thin")
+        y = $ + 8
+    end
+    
+    -- Spirit Bomb cooldown
+    if spiritbomb_cooldown[player] > 0 then
+        v.drawString(4, y, "Spirit Bomb: "..spiritbomb_cooldown[player]/TICRATE.."s", V_SNAPTOLEFT|V_SNAPTOBOTTOM, "thin")
+        y = $ + 8
+    else
+        v.drawString(4, y, "Spirit Bomb: READY", V_SNAPTOLEFT|V_SNAPTOBOTTOM|V_CYANMAP, "thin")
+        y = $ + 8
+    end
+    
+    -- Flight power
+    local color = V_GREENMAP
+    if flight_power[player] < 30 then color = V_REDMAP
+    elseif flight_power[player] < 60 then color = V_YELLOWMAP end
+    
+    v.drawString(4, y, "Flight: "..flight_power[player].."%", V_SNAPTOLEFT|V_SNAPTOBOTTOM|color, "thin")
+end, "game")`;
+  };
+
+  const generatePK3 = () => {
+    setDownloading(true);
+    
+    // Create a simple text file with instructions since we can't create actual PK3 in browser
+    const socContent = generateSOCFile();
+    const luaContent = generateLuaFile();
+    
+    const readmeContent = `# ${charName} - Dragon Ball Character for SRB2
+
+## Installation Instructions:
+
+1. This download contains the character definition files
+2. To create a proper PK3 file, you'll need to:
+   - Create a folder structure: SOC/ and Lua/
+   - Place the SOC file in the SOC/ folder
+   - Place the Lua file in the Lua/ folder
+   - Create character sprites (optional but recommended)
+   - Compress everything into a ZIP file
+   - Rename the .zip extension to .pk3
+
+## Controls:
+
+- **Custom Button 1**: Kamehameha (energy blast attack)
+- **Custom Button 2**: Spirit Bomb (hold to charge, release to fire)
+- **Jump twice**: Activate flight mode
+- Flight drains energy, recharges on ground
+
+## Character Stats:
+
+- Speed: 36 (Sonic-style speed)
+- Jump: Normal
+- Color: Orange
+- Abilities: Flight with Dragon Ball-style attacks
+
+## Files Included:
+
+1. ${charName.replace(/\s+/g, '')}.soc - Character definition
+2. OrangeSonic.lua - Custom ability scripts
+3. README.txt - This file
+
+## Notes:
+
+- Kamehameha has 1 second cooldown
+- Spirit Bomb has 3 second cooldown
+- Flight energy regenerates when on ground or in water
+- Character uses orange color scheme
+
+Enjoy your Dragon Ball-powered Sonic character!
+`;
+
+    const fullContent = `=== ${charName.replace(/\s+/g, '')}.soc ===
+
+${socContent}
+
+=== Lua/OrangeSonic.lua ===
+
+${luaContent}
+
+=== README.txt ===
+
+${readmeContent}`;
+
+    const blob = new Blob([fullContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${charName.replace(/\s+/g, '')}_SRB2_Files.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    setTimeout(() => setDownloading(false), 1000);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-500 via-red-500 to-yellow-500 p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-lg shadow-2xl p-8">
+          <h1 className="text-4xl font-bold text-center mb-2 text-orange-600">
+            SRB2 Dragon Ball Character Generator
+          </h1>
+          <p className="text-center text-gray-600 mb-8">
+            Create an Orange Sonic with Kamehameha, Spirit Bomb & Flight!
+          </p>
+
+          <div className="mb-8">
+            <label className="block text-sm font-bold text-gray-700 mb-2">
+              Character Name
+            </label>
+            <input
+              type="text"
+              value={charName}
+              onChange={(e) => setCharName(e.target.value)}
+              className="w-full px-4 py-2 border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500"
+              placeholder="Orange Sonic"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4 mb-8">
+            <div className="bg-gradient-to-br from-yellow-100 to-orange-100 p-6 rounded-lg border-2 border-orange-300">
+              <Zap className="w-12 h-12 text-yellow-600 mb-3 mx-auto" />
+              <h3 className="font-bold text-center text-lg mb-2">Kamehameha</h3>
+              <p className="text-sm text-gray-700 text-center">
+                Energy blast attack with 1s cooldown
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-100 to-cyan-100 p-6 rounded-lg border-2 border-cyan-300">
+              <div className="w-12 h-12 bg-cyan-500 rounded-full mb-3 mx-auto flex items-center justify-center text-white font-bold text-xl">
+                💫
+              </div>
+              <h3 className="font-bold text-center text-lg mb-2">Spirit Bomb</h3>
+              <p className="text-sm text-gray-700 text-center">
+                Hold to charge, release for massive damage
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-100 to-red-100 p-6 rounded-lg border-2 border-orange-300">
+              <Wind className="w-12 h-12 text-orange-600 mb-3 mx-auto" />
+              <h3 className="font-bold text-center text-lg mb-2">Flight</h3>
+              <p className="text-sm text-gray-700 text-center">
+                Press jump twice to fly with energy system
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-gray-100 rounded-lg p-6 mb-8">
+            <h3 className="font-bold text-lg mb-3">Character Features:</h3>
+            <ul className="space-y-2 text-gray-700">
+              <li>✓ Orange-colored Sonic character</li>
+              <li>✓ Sonic-style speed and movement</li>
+              <li>✓ Custom Button 1: Kamehameha attack</li>
+              <li>✓ Custom Button 2: Spirit Bomb (hold to charge)</li>
+              <li>✓ Flight ability with energy meter</li>
+              <li>✓ Visual effects for all abilities</li>
+              <li>✓ Cooldown system for balance</li>
+              <li>✓ On-screen HUD display</li>
+            </ul>
+          </div>
+
+          <button
+            onClick={generatePK3}
+            disabled={downloading}
+            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-4 px-8 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+          >
+            <Download className="w-6 h-6" />
+            {downloading ? 'Generating Files...' : 'Download Character Files'}
+          </button>
+
+          <div className="mt-6 bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+            <p className="text-sm text-gray-700">
+              <strong>Note:</strong> This generates the SOC and Lua script files for your character. 
+              You'll need to package them into a PK3 file format and optionally add custom sprites. 
+              Instructions are included in the download!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SRB2CharacterGenerator
