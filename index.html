@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Zap, Wind } from 'lucide-react';
+import { Download, Zap, Wind, FileArchive } from 'lucide-react';
 
 const SRB2CharacterGenerator = () => {
   const [charName, setCharName] = useState('Orange Sonic');
@@ -207,91 +207,132 @@ hud.add(function(v, player)
 end, "game")`;
   };
 
-  const generatePK3 = () => {
+  const generateS_SKIN = () => {
+    return `# S_SKIN for Orange Sonic
+name = orangesonic
+realname = ${charName}
+sprite = PLAY
+superspr = PLAY
+
+# Character properties
+ability = CA_FLY
+ability2 = CA_DOUBLEJUMP
+accel = 45
+thrustfactor = 5
+normalspeed = 36
+runspeed = 28
+jumpfactor = 1.0
+
+# Colors
+prefcolor = Orange
+supercolor = Supergold1
+
+# Flags
+flags = SF_NOSKID|SF_RUNONWATER
+
+# Sounds
+soundsid = 0
+
+# HUD
+hudname = ORANGE
+hudnamecol = \\x85
+
+# Description
+description = An orange-colored Sonic with Dragon Ball Z powers! Use Custom 1 for Kamehameha, Custom 2 for Spirit Bomb, and jump twice to fly!`;
+  };
+
+  const generatePK3 = async () => {
     setDownloading(true);
     
-    // Create a simple text file with instructions since we can't create actual PK3 in browser
-    const socContent = generateSOCFile();
-    const luaContent = generateLuaFile();
-    
-    const readmeContent = `# ${charName} - Dragon Ball Character for SRB2
+    try {
+      // Import JSZip from CDN
+      const JSZip = (await import('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js')).default;
+      
+      const zip = new JSZip();
+      
+      // Add SOC folder and file
+      const socFolder = zip.folder("SOC");
+      socFolder.file("OrangeSonic.soc", generateSOCFile());
+      
+      // Add Lua folder and file
+      const luaFolder = zip.folder("Lua");
+      luaFolder.file("OrangeSonic.lua", generateLuaFile());
+      
+      // Add S_SKIN file in Sprites folder
+      const spritesFolder = zip.folder("Sprites");
+      spritesFolder.file("S_SKIN.txt", generateS_SKIN());
+      
+      // Add a README
+      const readmeContent = `# ${charName} - Dragon Ball Character for SRB2
 
-## Installation Instructions:
-
-1. This download contains the character definition files
-2. To create a proper PK3 file, you'll need to:
-   - Create a folder structure: SOC/ and Lua/
-   - Place the SOC file in the SOC/ folder
-   - Place the Lua file in the Lua/ folder
-   - Create character sprites (optional but recommended)
-   - Compress everything into a ZIP file
-   - Rename the .zip extension to .pk3
+## Installation:
+1. Place this PK3 file in your SRB2 "mods" folder
+2. Load the mod in-game via the Addons menu
 
 ## Controls:
+- Custom Button 1: Kamehameha (energy blast)
+- Custom Button 2: Spirit Bomb (hold to charge)
+- Jump twice: Activate flight mode
 
-- **Custom Button 1**: Kamehameha (energy blast attack)
-- **Custom Button 2**: Spirit Bomb (hold to charge, release to fire)
-- **Jump twice**: Activate flight mode
-- Flight drains energy, recharges on ground
-
-## Character Stats:
-
-- Speed: 36 (Sonic-style speed)
-- Jump: Normal
-- Color: Orange
-- Abilities: Flight with Dragon Ball-style attacks
-
-## Files Included:
-
-1. ${charName.replace(/\s+/g, '')}.soc - Character definition
-2. OrangeSonic.lua - Custom ability scripts
-3. README.txt - This file
+## Features:
+- Orange-colored Sonic character
+- Kamehameha energy blast (1s cooldown)
+- Spirit Bomb charge attack (3s cooldown)
+- Flight ability with energy meter
+- Visual effects and HUD display
 
 ## Notes:
+- Character skin name: "orangesonic"
+- Flight energy recharges on ground/water
+- All abilities have visual particle effects
 
-- Kamehameha has 1 second cooldown
-- Spirit Bomb has 3 second cooldown
-- Flight energy regenerates when on ground or in water
-- Character uses orange color scheme
+## Files Included:
+- SOC/OrangeSonic.soc (character definition)
+- Lua/OrangeSonic.lua (ability scripts)
+- Sprites/S_SKIN.txt (character skin info)
 
-Enjoy your Dragon Ball-powered Sonic character!
+Note: This mod uses default Sonic sprites with orange coloring.
+For custom sprites, you would need to create sprite files.
+
+Created with SRB2 Dragon Ball Character Generator
 `;
-
-    const fullContent = `=== ${charName.replace(/\s+/g, '')}.soc ===
-
-${socContent}
-
-=== Lua/OrangeSonic.lua ===
-
-${luaContent}
-
-=== README.txt ===
-
-${readmeContent}`;
-
-    const blob = new Blob([fullContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${charName.replace(/\s+/g, '')}_SRB2_Files.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+      
+      zip.file("README.txt", readmeContent);
+      
+      // Generate the PK3 file
+      const blob = await zip.generateAsync({ type: "blob" });
+      
+      // Download the file
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${charName.replace(/\s+/g, '')}.pk3`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Error generating PK3:', error);
+      alert('Error generating PK3 file. Please try again.');
+    }
     
     setTimeout(() => setDownloading(false), 1000);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-500 via-red-500 to-yellow-500 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-2xl p-8">
-          <h1 className="text-4xl font-bold text-center mb-2 text-orange-600">
-            SRB2 Dragon Ball Character Generator
-          </h1>
-          <p className="text-center text-gray-600 mb-8">
-            Create an Orange Sonic with Kamehameha, Spirit Bomb & Flight!
+    <div className="min-h-screen bg-gradient-to-br from-orange-500 via-red-500 to-yellow-500 p-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-lg shadow-2xl p-6">
+          <div className="flex items-center justify-center mb-2">
+            <FileArchive className="w-10 h-10 text-orange-600 mr-2" />
+            <h1 className="text-3xl font-bold text-center text-orange-600">
+              SRB2 PK3 Generator
+            </h1>
+          </div>
+          <p className="text-center text-gray-600 mb-6 text-sm">
+            Generate a complete PK3 mod with Dragon Ball powers!
           </p>
 
-          <div className="mb-8">
+          <div className="mb-6">
             <label className="block text-sm font-bold text-gray-700 mb-2">
               Character Name
             </label>
@@ -304,62 +345,69 @@ ${readmeContent}`;
             />
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-yellow-100 to-orange-100 p-6 rounded-lg border-2 border-orange-300">
-              <Zap className="w-12 h-12 text-yellow-600 mb-3 mx-auto" />
-              <h3 className="font-bold text-center text-lg mb-2">Kamehameha</h3>
-              <p className="text-sm text-gray-700 text-center">
-                Energy blast attack with 1s cooldown
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="bg-gradient-to-br from-yellow-100 to-orange-100 p-4 rounded-lg border-2 border-orange-300">
+              <Zap className="w-8 h-8 text-yellow-600 mb-2 mx-auto" />
+              <h3 className="font-bold text-center text-sm mb-1">Kamehameha</h3>
+              <p className="text-xs text-gray-700 text-center">
+                Energy blast
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-100 to-cyan-100 p-6 rounded-lg border-2 border-cyan-300">
-              <div className="w-12 h-12 bg-cyan-500 rounded-full mb-3 mx-auto flex items-center justify-center text-white font-bold text-xl">
+            <div className="bg-gradient-to-br from-blue-100 to-cyan-100 p-4 rounded-lg border-2 border-cyan-300">
+              <div className="w-8 h-8 bg-cyan-500 rounded-full mb-2 mx-auto flex items-center justify-center text-white font-bold text-lg">
                 💫
               </div>
-              <h3 className="font-bold text-center text-lg mb-2">Spirit Bomb</h3>
-              <p className="text-sm text-gray-700 text-center">
-                Hold to charge, release for massive damage
+              <h3 className="font-bold text-center text-sm mb-1">Spirit Bomb</h3>
+              <p className="text-xs text-gray-700 text-center">
+                Charge attack
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-orange-100 to-red-100 p-6 rounded-lg border-2 border-orange-300">
-              <Wind className="w-12 h-12 text-orange-600 mb-3 mx-auto" />
-              <h3 className="font-bold text-center text-lg mb-2">Flight</h3>
-              <p className="text-sm text-gray-700 text-center">
-                Press jump twice to fly with energy system
+            <div className="bg-gradient-to-br from-orange-100 to-red-100 p-4 rounded-lg border-2 border-orange-300">
+              <Wind className="w-8 h-8 text-orange-600 mb-2 mx-auto" />
+              <h3 className="font-bold text-center text-sm mb-1">Flight</h3>
+              <p className="text-xs text-gray-700 text-center">
+                Jump twice
               </p>
             </div>
           </div>
 
-          <div className="bg-gray-100 rounded-lg p-6 mb-8">
-            <h3 className="font-bold text-lg mb-3">Character Features:</h3>
-            <ul className="space-y-2 text-gray-700">
-              <li>✓ Orange-colored Sonic character</li>
-              <li>✓ Sonic-style speed and movement</li>
-              <li>✓ Custom Button 1: Kamehameha attack</li>
-              <li>✓ Custom Button 2: Spirit Bomb (hold to charge)</li>
-              <li>✓ Flight ability with energy meter</li>
-              <li>✓ Visual effects for all abilities</li>
-              <li>✓ Cooldown system for balance</li>
-              <li>✓ On-screen HUD display</li>
+          <div className="bg-gray-100 rounded-lg p-4 mb-6">
+            <h3 className="font-bold text-base mb-2">PK3 Package Includes:</h3>
+            <ul className="space-y-1 text-sm text-gray-700">
+              <li>✓ SOC/OrangeSonic.soc - Character definition</li>
+              <li>✓ Lua/OrangeSonic.lua - Ability scripts</li>
+              <li>✓ Sprites/S_SKIN.txt - Skin configuration</li>
+              <li>✓ README.txt - Installation instructions</li>
+              <li>✓ All files properly organized in PK3 format</li>
+            </ul>
+          </div>
+
+          <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
+            <h3 className="font-bold text-base mb-2">Character Features:</h3>
+            <ul className="space-y-1 text-sm text-gray-700">
+              <li>🟠 Orange-colored Sonic character</li>
+              <li>⚡ Custom Button 1: Kamehameha attack</li>
+              <li>💫 Custom Button 2: Spirit Bomb (hold to charge)</li>
+              <li>🌪️ Flight ability with energy meter</li>
+              <li>✨ Visual effects for all abilities</li>
+              <li>📊 On-screen HUD display</li>
             </ul>
           </div>
 
           <button
             onClick={generatePK3}
             disabled={downloading}
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-4 px-8 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3 px-6 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            <Download className="w-6 h-6" />
-            {downloading ? 'Generating Files...' : 'Download Character Files'}
+            <Download className="w-5 h-5" />
+            {downloading ? 'Generating PK3...' : 'Download Complete PK3 File'}
           </button>
 
-          <div className="mt-6 bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
-            <p className="text-sm text-gray-700">
-              <strong>Note:</strong> This generates the SOC and Lua script files for your character. 
-              You'll need to package them into a PK3 file format and optionally add custom sprites. 
-              Instructions are included in the download!
+          <div className="mt-4 bg-green-50 border-2 border-green-300 rounded-lg p-3">
+            <p className="text-xs text-gray-700">
+              <strong>✅ Ready to use!</strong> This generates a complete PK3 file with all SOC, Lua, and sprite configuration files properly packaged. Just drop it in your SRB2 mods folder and load it!
             </p>
           </div>
         </div>
